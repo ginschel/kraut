@@ -3,6 +3,12 @@
 #include <string.h>
 #include <map>
 #include <iostream>
+std::string reg(int c) {
+	std::string vorgabe = "[ebp-";
+	vorgabe+=std::to_string(c*4);
+	vorgabe+="]";
+	return vorgabe;
+}
 int main(int argc, char *argv[]) {
 //Variableninitiallisierung
 int varzaehler =0;int strzaehler=0;
@@ -53,15 +59,79 @@ continue;
 }
 if(zeile == "Assemblerende") {
 asmblr = false;
-std::cout << "keck\n";
 continue;
 }
 if(asmblr) {
-std::cout << "Zeile " << zeile << std::endl;
 ausgabe << zeile << "\n";
 }
 else {
 std::string s; for (int i = 0; i < zeile.length(); ++i) {
+//Variablenmanipulation
+if(vartabelle.count(s) && zeile[i] == '=') {
+	std::string zahl;
+	bool zuweisung = 0, plus = 0, minus = 0, mal = 0, geteilt = 0;
+	for(int r = i+1; r < zeile.length(); ++r) {
+		if(zeile[r] != '.' && (zeile[r] != '+'|| zeile[r-1] == '=') && zeile[r] != '/' && zeile[r] != '*' && (zeile[r] != '-' || zeile[r-1] == '=')) zahl+=zeile[r];
+		else {
+			if(vartabelle.count(zahl)){
+				zahl = reg(vartabelle[zahl]);
+			}
+			if(zuweisung == 0) {
+				ausgabe << "mov eax"<<","<<zahl<<"\n";
+				zahl = "";
+				zuweisung = 1;
+			}
+			else {
+
+
+			//wenn flagge gesetzt ist
+			if(plus) {
+					ausgabe << "add eax"<<","<<zahl<<"\n";
+					zahl = ""; plus = 0;
+				}
+			if(minus) {
+					ausgabe << "sub eax"<<","<<zahl<<"\n";
+					zahl = ""; minus = 0;
+				}
+			if(mal) {
+					ausgabe << "imul eax,"<<zahl<<"\n";
+					zahl = ""; mal = 0;
+				}
+			if(geteilt) {
+					ausgabe << "mov ecx,"<<zahl<<"\n";
+					ausgabe << "div dword "<<"ecx"<<"\n";
+					zahl = ""; geteilt = 0;
+				}
+		}
+			switch(zeile[r]) {
+				case '+':
+					plus = 1;
+					break;
+				case '-':
+					minus = 1;
+					break;
+				case '*':
+					mal = 1;
+					break;
+				case '/':
+					geteilt = 1;
+					break;
+				default:
+					ausgabe << "mov "<<reg(vartabelle[s])<<",eax\n"; //gibt der Variable ihren neuen Wert aus dem Akkumulator
+					zahl = "";
+					i = zeile.length();
+					r = i;
+			}
+
+
+
+
+
+
+	}
+
+}
+}
 s+= zeile[i];
 if(s == "Drucke") {s="";
 for(int r = i+2; r < zeile.length(); ++r) {
@@ -78,6 +148,21 @@ if (zeile[r] == '.' && !anfuehrungsz){ ++strzaehler; ausgabe << "section .data\n
 //epilog
 }
 }
+else if(s == "Setze Fehlernummer") {s="";
+std::string zahl ="";
+for(int r = i+2; r < zeile.length(); ++r) {
+if(zeile[r] != '.') {
+zahl+=zeile[r];
+}
+else {
+if (vartabelle.count(zahl)) zahl = reg(vartabelle[zahl]);
+ausgabe << "mov eax,1\nmov ebx,"<<zahl<<"\nint 0x80\n";
+}
+
+}
+
+}
+//Fehlernummer
 }
 
 }
@@ -85,8 +170,6 @@ if (zeile[r] == '.' && !anfuehrungsz){ ++strzaehler; ausgabe << "section .data\n
 }
 //Ende der Hauptschleife
 std::cout << "x hat den Wert " << vartabelle["x"] << std::endl;
-std::cout << "kek hat den Wert " << vartabelle["kek"] << std::endl;
-//ausgabe << "mov ebx,[ebp-"<<vartabelle["kek"]*4<< "]\nmov eax, 1\nint 0x80\n";
 std::string const kompilier = std::string("nasm -f elf32 ") + argv[2] + " -o programm.o";
 std::cout << kompilier.c_str() << std::endl;
 //system(kompilier.c_str());
