@@ -2,7 +2,11 @@
 #include <string>
 #include <string.h>
 #include <map>
+#include <vector>
 #include <iostream>
+void test(std::string c) {
+	std::cout << "t" << c <<"t"<< std::endl;
+}
 std::string reg(int c) {
 	std::string vorgabe = "[ebp-";
 	vorgabe+=std::to_string(c*4);
@@ -11,11 +15,13 @@ std::string reg(int c) {
 }
 int main(int argc, char *argv[]) {
 //Variableninitiallisierung
-int varzaehler =0;int strzaehler=0;
+int varzaehler =0;int strzaehler=0; int wennzaehler = 0; int schleifenzaehler = 0;
 std::string var, varwert;
 bool gleichgefunden = 0; bool stringwert = 0; bool programmsektion = 0; bool asmblr = 0; bool anfuehrungsz =0;
 std::map<std::string, int> vartabelle;
 std::map<std::string, std::string> stringtabelle;
+std::vector<int> wennschlange,wennoderschleife;
+std::vector<std::string> schleifenschlange;
 std::string ifi = argv[1], ofi = argv[2];
 std::ifstream quelle(ifi); std::ofstream ausgabe(ofi);
 ausgabe << "global _start\n_start:\nmov ebp,esp\n";
@@ -37,8 +43,11 @@ else { gleichgefunden = true;
 }
 }
 else {
-if (!stringwert) {
+if(varwert[0] != '"') {
 if(zeile[r] != '=' && zeile[r] != '.' && zeile[r] != ';' && zeile[r] != ',') varwert += zeile[r];
+}
+else {
+if(zeile[r] != ';' && r!=zeile.length()-1 ) varwert += zeile[r];
 }
 }
 }
@@ -161,6 +170,127 @@ if (zeile[r] != '.') sprungmarke+=zeile[r];
 else ausgabe << "jmp " << sprungmarke << "\n";
 }
 }
+//WENN
+if(s == "Wenn") {
+std::string s1, s2,vergleicher;
+bool s1gef = 0, opgef = 0;
+bool grals = 0, klals = 0, gleich = 0, ungleich = 0, grgleichals = 0, klgleichals = 0;
+for(int r = i+2; r < zeile.length(); ++r) {
+if(s1gef == 0 && zeile[r] != ' ') s1+=zeile[r];
+if(zeile[r] == ' ' && s1gef == 0){ s1gef = true; continue;
+}
+if(opgef == 0 && s1gef == 1 && zeile[r] != ' ') vergleicher+=zeile[r];
+//jetzt kommen die vergleichsoperationen
+if(!opgef && zeile[r] == ' ') {
+if(vergleicher  == "größer" || vergleicher  == "groesser") {
+opgef =1; grals = 1; r+=1;
+}
+if(vergleicher  == "kleiner als" || vergleicher == "kleiner") {
+opgef =1; klals = 1; r+=1;
+}
+if(vergleicher  == "gleich") {
+opgef =1; gleich = 1; r+=1;
+}
+if(vergleicher  == "ungleich") {
+opgef =1; ungleich = 1; r+=1;
+}
+if(vergleicher  == "größer/gleich" || vergleicher == "groesser/gleich") {
+opgef =1; grgleichals = 1; r+=1;
+}
+if(vergleicher  == "kleiner/gleich") {
+opgef =1; klgleichals = 1; r+=1;
+}
+}
+if(opgef && zeile[r] != ' ' && zeile[r] != '.') s2+=zeile[r];
+if(zeile[r]=='.') {
+//schaut, ob s1 s2 Variablen sind und substituiert die Variablen mit ihren Zeigern
+if(vartabelle.count(s1)) s1=reg(vartabelle[s1]);
+if(vartabelle.count(s2)) s2=reg(vartabelle[s2]);
+//Standardfall
+ausgabe << "mov eax, "<<s1<<"\nmov ebx,"<<s2<<"\n";
+ausgabe << "cmp eax,ebx\n";
+//Durchgang durch alle Fälle, die es gibt
+if(grals) ausgabe << "jle Wennmarke"<<wennzaehler<<"\n";
+if(klals) ausgabe << "jge Wennmarke"<<wennzaehler<<"\n";
+if(gleich) ausgabe << "jne Wennmarke"<<wennzaehler<<"\n";
+if(ungleich) ausgabe << "je Wennmarke"<<wennzaehler<<"\n";
+if(grgleichals) ausgabe << "jl Wennmarke"<<wennzaehler<<"\n";
+if(klgleichals) ausgabe << "jg Wennmarke"<<wennzaehler<<"\n";
+wennschlange.push_back(wennzaehler);
+wennoderschleife.push_back(0);
+wennzaehler++;
+}
+//Ende des Parsers
+}
+}
+//WÄHREND
+if(s == "Während" || s=="Waehrend") {
+std::string s1, s2,vergleicher;
+bool s1gef = 0, opgef = 0;
+bool grals = 0, klals = 0, gleich = 0, ungleich = 0, grgleichals = 0, klgleichals = 0;
+for(int r = i+2; r < zeile.length(); ++r) {
+if(s1gef == 0 && zeile[r] != ' ') s1+=zeile[r];
+if(zeile[r] == ' ' && s1gef == 0){ s1gef = true; continue;
+}
+if(opgef == 0 && s1gef == 1 && zeile[r] != ' ') vergleicher+=zeile[r];
+//jetzt kommen die vergleichsoperationen
+if(!opgef && zeile[r] == ' ') {
+if(vergleicher  == "größer" || vergleicher  == "groesser") {
+opgef =1; grals = 1; r+=1;
+}
+if(vergleicher  == "kleiner als" || vergleicher == "kleiner") {
+opgef =1; klals = 1; r+=1;
+}
+if(vergleicher  == "gleich") {
+opgef =1; gleich = 1; r+=1;
+}
+if(vergleicher  == "ungleich") {
+opgef =1; ungleich = 1; r+=1;
+}
+if(vergleicher  == "größer/gleich" || vergleicher == "groesser/gleich") {
+opgef =1; grgleichals = 1; r+=1;
+}
+if(vergleicher  == "kleiner/gleich") {
+opgef =1; klgleichals = 1; r+=1;
+}
+}
+if(opgef && zeile[r] != ' ' && zeile[r] != '.') s2+=zeile[r];
+if(zeile[r]=='.') {
+//schaut, ob s1 s2 Variablen sind und substituiert die Variablen mit ihren Zeigern
+if(vartabelle.count(s1)) s1=reg(vartabelle[s1]);
+if(vartabelle.count(s2)) s2=reg(vartabelle[s2]);
+//Standardfall
+std::string aus = "mov eax, "+s1+"\nmov ebx,"+s2+"\ncmp eax,ebx\n";
+//Durchgang durch alle Fälle, die es gibt
+if(grals) aus+= "jg Schleifenmarke";
+if(klals) aus+= "jl Schleifenmarke";
+if(gleich) aus+=  "je Schleifenmarke";
+if(ungleich) aus+= "jne Schleifenmarke";
+if(grgleichals) aus+= "jge Schleifenmarke";
+if(klgleichals) aus+= "jle Schleifenmarke";
+aus+=std::to_string(schleifenzaehler)+"\n";
+schleifenschlange.push_back(aus);
+ausgabe << "Schleifenmarke"<<schleifenzaehler<<":\n";
+wennoderschleife.push_back(1);
+schleifenzaehler++;
+}
+//Ende des Parsers
+}
+}
+if(s=="Mach weiter.") {
+//Wenn ein Wenn aufm Stack ist
+if(!*wennoderschleife.rbegin()) {
+ausgabe << "Wennmarke"<<*wennschlange.rbegin()<<":\n";
+wennschlange.pop_back();
+}
+//wenn eine Schleife aufm Stack ist
+else {
+ausgabe << *schleifenschlange.rbegin();
+schleifenschlange.pop_back();
+}
+wennoderschleife.pop_back();
+}
+
 //print
 if(s == "Drucke") {s="";
 std::string stringname ="";
