@@ -15,6 +15,7 @@ int varzaehler =0;int strzaehler=0;
 std::string var, varwert;
 bool gleichgefunden = 0; bool stringwert = 0; bool programmsektion = 0; bool asmblr = 0; bool anfuehrungsz =0;
 std::map<std::string, int> vartabelle;
+std::map<std::string, std::string> stringtabelle;
 std::string ifi = argv[1], ofi = argv[2];
 std::ifstream quelle(ifi); std::ofstream ausgabe(ofi);
 ausgabe << "global _start\n_start:\nmov ebp,esp\n";
@@ -43,16 +44,34 @@ if(zeile[r] != '=' && zeile[r] != '.' && zeile[r] != ';' && zeile[r] != ',') var
 }
 }
 }
-//wieder im Deklarationsschleife
+//wieder in der Deklarationsschleife
 //std::cout << var << std::endl;
 //std::cout << varwert << std::endl;
+if(varwert[0] != '"') {
+std::cout << varwert[0] << std::endl;
 vartabelle[var] = ++varzaehler;
 ausgabe << "push "<< varwert<<"\n";
+}
+//prüft, ob der Wert ein String ist
+else {
+ausgabe << "section .data\n"<<var<<" db "<<varwert<<"\nsection .text\n";
+varwert.pop_back(); varwert.erase(varwert.begin());
+stringtabelle[var] = varwert;
+}
+//RESET
 gleichgefunden = false;
 var = ""; varwert="";
 }
 //Programmsektion
 else {
+//Schutz vor zu kurzen Zeilen...
+if(!zeile.empty()); {
+//Labels
+if(*zeile.rbegin() == ':') {
+ausgabe << zeile << "\n";
+continue;
+}
+}
 if(zeile == "Assemblerstart") {
 asmblr = true;
 continue;
@@ -132,8 +151,19 @@ if(vartabelle.count(s) && zeile[i] == '=') {
 
 }
 }
+//Hier ist der Befehlsscanner s
 s+= zeile[i];
+//goto
+if(s == "Springe in") {
+std::string sprungmarke;
+for(int r = i+2; r < zeile.length(); ++r) {
+if (zeile[r] != '.') sprungmarke+=zeile[r];
+else ausgabe << "jmp " << sprungmarke << "\n";
+}
+}
+//print
 if(s == "Drucke") {s="";
+std::string stringname ="";
 for(int r = i+2; r < zeile.length(); ++r) {
 if(zeile[r] == '"') {
 if(anfuehrungsz) {
@@ -143,6 +173,9 @@ else { anfuehrungsz = true; continue;
 }
 }
 if (anfuehrungsz) s+=zeile[r];
+else stringname+=zeile[r];
+if(zeile[r] ==',') stringname="";
+if (stringtabelle.count(stringname)) s+=stringtabelle[stringname];
 if (zeile[r] == '.' && !anfuehrungsz){ ++strzaehler; ausgabe << "section .data\nmsg" << strzaehler<<" db "<< '"' << s << '"' << ",0x0a\nlen" << strzaehler<<" equ $- msg"<<strzaehler<<"\nsection .text\nmov eax,4\nmov ebx,1\nmov ecx, msg"<<strzaehler<<"\nmov edx,len"<<strzaehler<<"\nint 0x80\n";
 }
 //epilog
