@@ -16,6 +16,7 @@ std::string reg(int c) {
 int main(int argc, char *argv[]) {
 //Variableninitiallisierung
 int varzaehler =0;int strzaehler=0; int wennzaehler = 0; int schleifenzaehler = 0; int variablenausgaben = 0;
+int schreibzaehler = 0;
 std::string var, varwert;
 bool gleichgefunden = 0; bool stringwert = 0; bool programmsektion = 0; bool asmblr = 0; bool anfuehrungsz =0;
 std::map<std::string, int> vartabelle;
@@ -309,7 +310,43 @@ schleifenschlange.pop_back();
 }
 wennoderschleife.pop_back();
 }
-
+//schreibe
+if(s == "Schreibe") { s="";
+std::string nachr="",datei=""; bool in = 0,zeichenktt=0;
+for (int r=i+2; r < zeile.length();++r) {
+	test(nachr);
+	if(zeile[r] == '"' && zeichenktt==0 && !in) {zeichenktt=1; nachr+=zeile[r];continue;}
+	if(!in) {
+		if(!zeichenktt) {
+		if(zeile[r] != ' ') nachr+=zeile[r];
+		else {
+			r+=2; in = 1;
+			test("in");
+		}
+		}
+		else {
+			nachr+=zeile[r];
+			test(nachr);
+			if(zeile[r] == '"') {
+				r+=4; in = 1;
+			}
+		}
+	}
+	else {
+		if (zeile[r] == '.' && zeile[r-1] == '"') {
+			//filtert nach schon bestehenden Strings
+			if(nachr[0] == '"' && *nachr.rbegin() == '"') {
+				ausgabe << "section .data\n_pfad"<<schreibzaehler<<" dd "<<datei<<"\n_nachr"<<schreibzaehler<<" dd "<<nachr<<",0x0a\n_nachr"<<schreibzaehler<<"len equ $- _nachr"<<schreibzaehler<<"\nsection .text\nmov eax,5\nmov ebx,_pfad"<<schreibzaehler<<"\nmov ecx,101o\nmov edx,700o\nint 0x80\nmov ebx,eax\nmov eax, 4\nmov ecx,_nachr"<<schreibzaehler<<"\nmov edx,"<<"_nachr"<<schreibzaehler<<"len\nint 0x80\n";
+			}
+			else ausgabe << "section .data\n_pfad"<<schreibzaehler<<" dd "<<datei<<"\nsection .text\nmov eax,5\nmov ebx,_pfad"<<schreibzaehler<<"\nmov ecx,101o\nmov edx,700o\nint 0x80\nmov ebx,eax\nmov eax, 4\nmov ecx,"<<nachr<<"\nmov edx,"<<nachr<<"len\nint 0x80\n";
+			//erstellt Datei
+			test(nachr);test(datei);
+			schreibzaehler++;
+		}
+		else datei+=zeile[r];
+	}
+}
+}
 //print
 if(s == "Drucke") {s="";
 std::string stringname ="";
