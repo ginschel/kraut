@@ -15,7 +15,7 @@ std::string reg(int c) {
 }
 int main(int argc, char *argv[]) {
 //Variableninitiallisierung
-int varzaehler =0;int strzaehler=0; int wennzaehler = 0; int schleifenzaehler = 0;
+int varzaehler =0;int strzaehler=0; int wennzaehler = 0; int schleifenzaehler = 0; int variablenausgaben = 0;
 std::string var, varwert;
 bool gleichgefunden = 0; bool stringwert = 0; bool programmsektion = 0; bool asmblr = 0; bool anfuehrungsz =0;
 std::map<std::string, int> vartabelle;
@@ -24,7 +24,7 @@ std::vector<int> wennschlange,wennoderschleife;
 std::vector<std::string> schleifenschlange;
 std::string ifi = argv[1], ofi = argv[2];
 std::ifstream quelle(ifi); std::ofstream ausgabe(ofi);
-ausgabe << "global _start\n_start:\nmov ebp,esp\n";
+ausgabe << "global _start\n_start:\nmov ebp,esp\nsection .data\n_nar db \"000000000000000000000000000000000\"\nsection .text\n";
 std::cout << "starte compiler\n";
 //Hauptschleife
 while(quelle.good()) {
@@ -63,7 +63,7 @@ ausgabe << "push "<< varwert<<"\n";
 }
 //prüft, ob der Wert ein String ist
 else {
-ausgabe << "section .data\n"<<var<<" db "<<varwert<<"\nsection .text\n";
+ausgabe << "section .data\n"<<var<<" db "<<varwert<<"\n"<<var<<"len equ $- "<<var<<"\nsection .text\n";
 varwert.pop_back(); varwert.erase(varwert.begin());
 stringtabelle[var] = varwert;
 }
@@ -159,6 +159,25 @@ if(vartabelle.count(s) && zeile[i] == '=') {
 	}
 
 }
+}
+else if(stringtabelle.count(s) && zeile[i]=='[') {
+	std::string welcheselement,ersatz;
+	bool elementgef = 0;
+	for(int r = i+1; r < zeile.length(); ++r) {
+		if(zeile[r] != ']' && !elementgef) welcheselement+=zeile[r];
+		if(zeile[r]==']') {
+			elementgef = 1; r+=2;
+		}
+		if (elementgef && zeile[r] != '.') ersatz += zeile[r];
+		if (zeile[r] == '.') {
+			ausgabe <<"mov [" <<s<<"+"<<welcheselement<<"],byte "<<ersatz << "\n";
+			std::string temp = stringtabelle[s];int we = std::stoi(welcheselement);
+			if(we < temp.length()) {
+				temp[we] = ersatz[1];
+				stringtabelle[s] = temp; }
+		}
+
+	}
 }
 //Hier ist der Befehlsscanner s
 s+= zeile[i];
@@ -309,6 +328,29 @@ if (stringtabelle.count(stringname)) s+=stringtabelle[stringname];
 if (zeile[r] == '.' && !anfuehrungsz){ ++strzaehler; ausgabe << "section .data\nmsg" << strzaehler<<" db "<< '"' << s << '"' << ",0x0a\nlen" << strzaehler<<" equ $- msg"<<strzaehler<<"\nsection .text\nmov eax,4\nmov ebx,1\nmov ecx, msg"<<strzaehler<<"\nmov edx,len"<<strzaehler<<"\nint 0x80\n";
 }
 //epilog
+}
+}
+if(s == "Gebe aus") {s="";
+std::string stringlaenge =""; int anfuehrungseichen =0; bool klammer = 0, variable = 0;
+for(int r = i+2; r < zeile.length(); ++r) {
+if (!variable) {
+if(zeile[r] != '.') {
+if(zeile[r] == '(') klammer = 1;
+if (klammer == 0) s+=zeile[r];
+if(vartabelle.count(s)&&zeile[r+1]=='.') variable = 1;
+if(zeile[r] == ')') klammer = 0;
+if (klammer && zeile[r]!='(') stringlaenge+=zeile[r];
+}
+else {
+if(stringlaenge=="") ausgabe << "mov eax,4\nmov ebx,1\nmov ecx,"<<s<<"\nmov edx,"<<s<<"len\nint 0x80\n";
+else ausgabe << "mov eax,4\nmov ebx,1\nmov ecx,"<<s<<"\nmov edx,"<<stringlaenge<<"\nint 0x80\n";
+}
+}
+//Variablenausgabealgorithmus
+else {
+ausgabe<< "mov ecx,0\nmov eax,"<<reg(vartabelle[s])<<"\nmov ebx,10\n_a"<<variablenausgaben<<":\nxor edx, edx\ndiv ebx\npush edx\ninc ecx\ncmp eax, 0\n jg _a"<<variablenausgaben<<"\nmov edx,ecx\n_b"<<variablenausgaben<<":\nmov ebx,edx\npop eax\nadd eax,48\nsub ebx,ecx\nmov [_nar+ebx],eax\ndec ecx\ncmp ecx,0\njg _b"<<variablenausgaben<<"\nmov [_nar+edx],byte 0x0a\ninc edx\nmov eax,4\nmov ebx,1\nmov ecx, _nar\nint 0x80\n";
+variablenausgaben++;
+}
 }
 }
 else if(s == "Setze Fehlernummer") {s="";
