@@ -23,7 +23,7 @@ std::map<std::string, int> vartabelle;
 std::map<std::string, std::string> stringtabelle;
 std::vector<int> wennschlange,wennoderschleife;
 std::vector<std::string> schleifenschlange;
-std::string ifi = argv[1], ofi = argv[2];
+std::string ifi = argv[1], ofi = argv[2]; ofi+=".s";
 std::ifstream quelle(ifi); std::ofstream ausgabe(ofi);
 ausgabe << "global _start\n_start:\nmov ebp,esp\nsection .data\n_nar db \"000000000000000000000000000000000\"\nsection .text\n";
 std::cout << "starte compiler\n";
