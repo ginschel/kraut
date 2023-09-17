@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+  <meta charset="utf-8">
+  <title>zekraut.md - Grip</title>
+  <link rel="icon" href="http://localhost:6419/__/grip/static/favicon.ico">
+  <link rel="stylesheet" href="zekraut_programming_language_files/dark_tritanopia-3a26e78ad0ff.css">
+  <link rel="stylesheet" href="zekraut_programming_language_files/primer-primitives-6143c8f97ed1.css">
+  <link rel="stylesheet" href="zekraut_programming_language_files/github-eb793512a19a.css">
+  <link rel="stylesheet" href="zekraut_programming_language_files/light_colorblind-c414b5ba1dce.css">
+  <link rel="stylesheet" href="zekraut_programming_language_files/light_tritanopia-299ac9c64ec0.css">
+  <link rel="stylesheet" href="zekraut_programming_language_files/dark-5d486a4ede8e.css">
+  <link rel="stylesheet" href="zekraut_programming_language_files/light-a09cef873428.css">
+  <link rel="stylesheet" href="zekraut_programming_language_files/light_high_contrast-e5868b7374db.css">
+  <link rel="stylesheet" href="zekraut_programming_language_files/global-ff0cd5eb8b00.css">
+  <link rel="stylesheet" href="zekraut_programming_language_files/dark_colorblind-bf5665b96628.css">
+  <link rel="stylesheet" href="zekraut_programming_language_files/code-f68e2653d00d.css">
+  <link rel="stylesheet" href="zekraut_programming_language_files/dark_high_contrast-8438e75afd36.css">
+  <link rel="stylesheet" href="zekraut_programming_language_files/dark_dimmed-27c8d635e4e5.css">
+  <link rel="stylesheet" href="zekraut_programming_language_files/primer-903aefe99058.css">
+  <link rel="stylesheet" href="zekraut_programming_language_files/octicons.css">
+  <style>
+    /* Page tweaks */
+    .preview-page {
+      margin-top: 64px;
+      margin-bottom: 21px;
+    }
+    /* User-content tweaks */
+    .timeline-comment-wrapper > .timeline-comment:after,
+    .timeline-comment-wrapper > .timeline-comment:before {
+      content: none;
+    }
+    /* User-content overrides */
+    .discussion-timeline.wide {
+      width: 920px;
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <div id="preview-page" class="preview-page" data-autorefresh-url="/__/grip/refresh/">
+    <main id="js-repo-pjax-container">
+      <div class="clearfix new-discussion-timeline container-xl px-3 px-md-4 px-lg-5">
+        <div class="repository-content">
+          <div class="clearfix">
+            <div class="Layout Layout--flowRow-until-md Layout--sidebarPosition-end Layout--sidebarPosition-flowRow-end">
+              <div class="Layout-main">
+
+                
+
+                  <div id="readme" class="Box md Box--responsive">
+                    
+                      <div class="Box-header d-flex border-bottom-0 flex-items-center flex-justify-between color-bg-default rounded-top-2">
+                        <div class="d-flex flex-items-center">
+                          <h2 class="Box-title">
+                            zekraut.md
+                          </h2>
+                        </div>
+                      </div>
+                    
+                    <div class="Box-body px-5 pb-5">
+                      <article id="grip-content" class="markdown-body entry-content container-lg">
+                        <h1><a id="user-content-ze-kraut-programming-language" class="anchor" aria-hidden="true" tabindex="-1" href="#ze-kraut-programming-language"><span aria-hidden="true" class="octicon octicon-link"></span></a>Ze kraut Programming Language</h1>
+<h2><a id="user-content-what-is-kraut" class="anchor" aria-hidden="true" tabindex="-1" href="#what-is-kraut"><span aria-hidden="true" class="octicon octicon-link"></span></a>What is kraut?</h2>
+<p>kraut is a very small programming language that serves as a quick and
+ efficient way to write small but effeective programms that are 
+automatically compiled into x86 assembly. It has been inspired of the 
+COBOL programming language but isn't nearly as complex as it which makes
+ it way easier to use. You could call kraut a german prototype of a more
+ modern COBOL.</p>
+<p>kraut's compiler only supports 32bit NASM assembler thus it can be 
+run on 32bit machines and on 64bit machines. Moreover, it only runs on 
+Linux since the syscalls it has to make at the assembly level are only 
+compatible with Linux.</p>
+<h2><a id="user-content-how-the-compiler-works" class="anchor" aria-hidden="true" tabindex="-1" href="#how-the-compiler-works"><span aria-hidden="true" class="octicon octicon-link"></span></a>How the compiler works</h2>
+<p>Every integer declaration is pushed on the stack and is getting 
+referenced by the initial stack pointer (represented by the ebp) minus 
+its offset which is stored at the c++ level in an integer map.</p>
+<p>The compiler aka kraut.cpp has two ways to store string values. The 
+first one can be at the compiler level which means that strings are 
+stored in a stringmap and are output into the actual assembler file (you
+ can see the NASM output in the *.s file) when they are referenced.</p>
+<p>The other way is to reference the strings directly in the *.s file. 
+This has the advantage that one is able to reference the actual 
+assembler strings at a lower level than only relying on the string 
+storage in the compiler.</p>
+<p>The command "Drucke" one the one hand takes full advantage of the 
+string concatenation at the c++ level to make it easier to concatenate 
+strings in order to print them to the terminal.</p>
+<p>"Gebe aus" on the other hand only references at an assembler level 
+which makes it possible to work with strings that are not stored in the 
+stringmap which the compiler uses for the most part.</p>
+<h1><a id="user-content-how-to-compile" class="anchor" aria-hidden="true" tabindex="-1" href="#how-to-compile"><span aria-hidden="true" class="octicon octicon-link"></span></a>How to compile</h1>
+<p>Compilation is quite easy. Just take advantage of the runnable shell 
+script called krautscript and specify your krautfile and your 
+programmname like that:</p>
+<pre><code>./krautscript hallowelt.krt hallowelt
+</code></pre>
+<p>Quite easy isn't it?</p>
+<h1><a id="user-content-krautprogrammstruktur" class="anchor" aria-hidden="true" tabindex="-1" href="#krautprogrammstruktur"><span aria-hidden="true" class="octicon octicon-link"></span></a>Krautprogrammstruktur</h1>
+<p>Kraut is divided into a declaration section (you could call it 
+Deklarierungssektion since kraut is completely German) and the actual 
+programming section (Programmsektion).</p>
+<p>You dont have to specify the Deklarierungssektion since the compiler 
+doesn't make it mandatory but in case you want to structure your 
+programm in a better way, just write Deklarierungssektion at the 
+beginning of the file.</p>
+<p>The only command that one is able to give in this section is the 
+define command (Definiere). Therefore, you can only define and declare 
+strings and integers in this section.</p>
+<p>Then there is the Programmsektion which one has to specify in a line beforehand.</p>
+<p>This is the section where you will write your actual kraut program in.</p>
+<h1><a id="user-content-the-syntax" class="anchor" aria-hidden="true" tabindex="-1" href="#the-syntax"><span aria-hidden="true" class="octicon octicon-link"></span></a>The syntax</h1>
+<p>I made the syntax very strict in order to simplify the compiler and 
+to concentrate more on the development of the actual language.</p>
+<p>You have to watch out for these core parts of kraut's syntax:</p>
+<ul>
+<li>every command has to end with a dot like a real sentence</li>
+<li>every line only includes one command</li>
+<li>every program has to have a Programmsektion or the compiler will write nonsense to the NASM file</li>
+<li>watch out for unnecessary spaces! They will break your program!</li>
+</ul>
+<h1><a id="user-content-hallo-welt" class="anchor" aria-hidden="true" tabindex="-1" href="#hallo-welt"><span aria-hidden="true" class="octicon octicon-link"></span></a>hallo Welt!</h1>
+<p>To make this manual way easier to read I want to include an example of how to write a hello world program. It's quite easy.</p>
+<pre><code>Programmsektion
+Drucke "hallo Welt!".
+</code></pre>
+<h1><a id="user-content-working-with-integers" class="anchor" aria-hidden="true" tabindex="-1" href="#working-with-integers"><span aria-hidden="true" class="octicon octicon-link"></span></a>Working with integers</h1>
+<pre><code>Definiere x=23.
+Definiere hallo="einszweidrei".
+Programmsektion
+;This comment will be unnoticed by the compiler
+x=x+2*3.
+;x will be added to 2 (25) and then multiplied by 3 (kraut treats every operation like in brackets)
+hallo[0]='n'.
+hallo[1]='e'.
+hallo[2]='u'.
+hallo[3]='n'.
+;the first four bytes where hallo points to are now "neun"
+Gebe aus x.
+; The command "Gebe aus" can output numbers at the assembler level which means you could also give out a register directly
+;the compiler will translate x immediately to [ebp-4] which stores the value of x
+Drucke hallo,"zehn".
+; concatenates hallo and "zehn" to "einszweidreizehn" and prints it to the terminal
+Setze Fehlernummer x.
+;will output the value of x as the return code of the program. One could also just write a literal number instead of x or a register
+
+; here is a little trick to modify strings at the assembler level while expanding it
+hallo[12]=0x0a.
+; hallo now includes a newline character at the index 12 which wouldnt be output by "Gebe aus" since NASM wouldnt know that the string size of hallo has increased
+Gebe aus hallo(13).
+; This will output hallo with the appended newline character since the number in the brackets specifies the length of the string that shall be output
+</code></pre>
+<h2><a id="user-content-if-statements" class="anchor" aria-hidden="true" tabindex="-1" href="#if-statements"><span aria-hidden="true" class="octicon octicon-link"></span></a>If statements</h2>
+<p>All if statements (Wenn) have to end with "Mach weiter." (it's the same as end-if in this context).
+Everything that is inbetween the Wenn and Mach weiter will be executed in case the Wenn-statement is true.</p>
+<pre><code>Definiere x=23.
+Programmsektion
+Wenn x kleiner 24.
+Drucke "hallo".
+; Drucke wird ausgeführt, weil 23 kleiner 24 ist
+Mach weiter.
+</code></pre>
+<p>I want to list all of the possible Wenn statements and their translations:</p>
+<ul>
+<li>Wenn x kleiner r : x &lt; r</li>
+<li>Wenn x größer r or Wenn x groesser r : x &gt; r</li>
+<li>Wenn x gleich r: x = r</li>
+<li>Wenn x ungleich r: x != r</li>
+<li>Wenn x  größer/gleich r or Wenn x groesser/gleich r : x &gt;= r</li>
+<li>Wenn x kleiner/gleich r : x &lt;= r</li>
+</ul>
+<h2><a id="user-content-while-statements" class="anchor" aria-hidden="true" tabindex="-1" href="#while-statements"><span aria-hidden="true" class="octicon octicon-link"></span></a>While statements</h2>
+<p>Its syntax is similar to Wenn. Everything that is included inbetween 
+Während and Mach weiter will get executed in case Während is true.</p>
+<p>Keep in Mind that the compiler can see the difference between a Mach 
+weiter of a Wenn statement and a Mach weiter of a Während statements 
+which make it possible to combine the conditional statements with the 
+while loop.</p>
+<pre><code>Definiere x=1.
+Programmsektion
+Während x kleiner 5.
+Drucke "hallo".
+x=x+1.
+Mach weiter.
+</code></pre>
+<p>One can substitute Während with Waehrend to make it possible to write kraut programs on a non German keyboard.</p>
+<h2><a id="user-content-goto-statements" class="anchor" aria-hidden="true" tabindex="-1" href="#goto-statements"><span aria-hidden="true" class="octicon octicon-link"></span></a>Goto statements</h2>
+<p>Every line that ends with : will be treated as a label by the 
+compiler which can be accessed with Spring in (the jump/goto statement).</p>
+<pre><code>Programmsektion
+Springe in qwertz.
+Drucke "1234".
+qwertz:
+Drucke "5678".
+;1234 wont be printed since the jump statement jumps to qwertz
+</code></pre>
+<h2><a id="user-content-embedding-assembly-into-the-code" class="anchor" aria-hidden="true" tabindex="-1" href="#embedding-assembly-into-the-code"><span aria-hidden="true" class="octicon octicon-link"></span></a>Embedding assembly into the code</h2>
+<p>In case you want to program at the assembly level to make it possible
+ to implement functions in your program that kraut doesnt support yet, 
+you can take advantage of the subsection of the Programmsektion by 
+including "Assemblerstart" in a line and ending this subsection with 
+"Assemblerende".</p>
+<p>Everything that is inbetween those keywords will immediately be 
+copied into the NASM file without any modification by the compiler.</p>
+<p>Since they are just marking a subsection they shouldnt be ended with a dot!</p>
+<pre><code>Programmsektion
+Drucke "test".
+Assemblerstart
+mov eax, 1
+mov ebx, 87
+int 0x80
+Assemblerende
+</code></pre>
+<h2><a id="user-content-writing-to-file" class="anchor" aria-hidden="true" tabindex="-1" href="#writing-to-file"><span aria-hidden="true" class="octicon octicon-link"></span></a>Writing to file</h2>
+<p>You can even write strings to a file by using "Schreibe".</p>
+<pre><code>Programmsektion
+Schreibe "hallo Welt!" in "testdatei".
+</code></pre>
+<p>This will write hallo Welt! in the newly created file called testdatei.</p>
+
+                      </article>
+                    </div>
+                  </div>
+
+                
+
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+  </div><script>
+    function showCanonicalImages() {
+      var images = document.getElementsByTagName('img');
+      if (!images) {
+        return;
+      }
+      for (var index = 0; index < images.length; index++) {
+        var image = images[index];
+        if (image.getAttribute('data-canonical-src') && image.src !== image.getAttribute('data-canonical-src')) {
+          image.src = image.getAttribute('data-canonical-src');
+        }
+      }
+    }
+
+    function scrollToHash() {
+      if (location.hash && !document.querySelector(':target')) {
+        var element = document.getElementById('user-content-' + location.hash.slice(1));
+        if (element) {
+           element.scrollIntoView();
+        }
+      }
+    }
+
+    function autorefreshContent(eventSourceUrl) {
+      var initialTitle = document.title;
+      var contentElement = document.getElementById('grip-content');
+      var source = new EventSource(eventSourceUrl);
+      var isRendering = false;
+
+      source.onmessage = function(ev) {
+        var msg = JSON.parse(ev.data);
+        if (msg.updating) {
+          isRendering = true;
+          document.title = '(Rendering) ' + document.title;
+        } else {
+          isRendering = false;
+          document.title = initialTitle;
+          contentElement.innerHTML = msg.content;
+          showCanonicalImages();
+        }
+      }
+
+      source.onerror = function(e) {
+        if (e.readyState === EventSource.CLOSED && isRendering) {
+          isRendering = false;
+          document.title = initialTitle;
+        }
+      }
+    }
+
+    window.onhashchange = function() {
+      scrollToHash();
+    }
+
+    window.onload = function() {
+      scrollToHash();
+    }
+
+    showCanonicalImages();
+
+    var autorefreshUrl = document.getElementById('preview-page').getAttribute('data-autorefresh-url');
+    if (autorefreshUrl) {
+      autorefreshContent(autorefreshUrl);
+    }
+  </script>
+
+</body></html>
