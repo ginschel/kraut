@@ -1,5 +1,5 @@
 g++ kraut.cpp -o kraut
 ./kraut $1 $2
-nasm -f elf32 -g $2.s -o $2.o; ld -m elf_i386 $2.o -o $2
-./$2; echo $?
+nasm -f elf32 $2.s -o $2.o; ld -m elf_i386 $2.o -o $2
+./$2; 
 rm $2.o
